@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nuestra Historia — 10 años juntos</title>
+  <title>Nuestra Historia — Desde el 18 de julio de 2021</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <style>
     :root {
       --bg: #faf7f2;
       --card: #ffffff;
-      --text: #2c2623;
-      --muted: #786e68;
-      --accent: #c86d51;
-      --accent-hover: #b0593e;
-      --line: #e4dcd3;
+      --text: #2a2433;
+      --muted: #6f667a;
+      --accent: #8b6bb7;
+      --accent-hover: #73539e;
+      --accent-soft: #f3eef9;
+      --line: #e4dceb;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,19 +28,67 @@
     header {
       text-align: center;
       padding: 3.5rem 1.5rem 2rem;
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
     }
     header h1 {
-      font-size: 2.2rem;
+      font-size: 2.3rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       margin-bottom: 0.5rem;
+      color: var(--text);
     }
     header p {
       color: var(--muted);
       font-size: 1.05rem;
     }
+
+    /* Contador de tiempo juntos */
+    .counter-box {
+      display: none;
+      margin: 1.5rem auto 0.5rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 6px 20px rgba(139, 107, 183, 0.08);
+      max-width: 560px;
+    }
+    .counter-box.active { display: block; }
+    .counter-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.65rem;
+    }
+    .counter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    .counter-unit {
+      background: var(--accent-soft);
+      border-radius: 12px;
+      padding: 0.6rem 0.35rem;
+    }
+    .counter-unit strong {
+      display: block;
+      font-size: 1.35rem;
+      color: var(--accent-hover);
+      line-height: 1.2;
+    }
+    .counter-unit span {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .counter-total {
+      margin-top: 0.65rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
     .toolbar {
       display: none;
       justify-content: center;
@@ -51,26 +101,28 @@
       background: var(--accent);
       color: #fff;
       border: none;
-      padding: 0.6rem 1.2rem;
+      padding: 0.6rem 1.25rem;
       border-radius: 999px;
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
     button:hover { background: var(--accent-hover); }
+    button:active { transform: scale(0.98); }
     button.secondary {
-      background: transparent;
+      background: var(--card);
       color: var(--text);
       border: 1px solid var(--line);
     }
-    button.secondary:hover { background: #efe9e1; }
+    button.secondary:hover { background: var(--accent-soft); }
     button.danger {
-      background: #d9534f;
-      padding: 0.35rem 0.75rem;
+      background: #c95b6b;
+      padding: 0.35rem 0.8rem;
       font-size: 0.8rem;
       margin-top: 0.75rem;
     }
+    button.danger:hover { background: #b04656; }
 
     /* Paneles de login y subida */
     .panel {
@@ -78,8 +130,9 @@
       margin: 1rem auto 2.5rem;
       background: var(--card);
       padding: 1.75rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px rgba(139, 107, 183, 0.08);
       display: none;
     }
     .panel.active { display: block; }
@@ -94,8 +147,15 @@
       border-radius: 10px;
       font-size: 0.95rem;
       font-family: inherit;
+      color: var(--text);
+      background: #fdfcff;
     }
-    .status { font-size: 0.85rem; margin-top: 0.75rem; color: var(--accent); }
+    .field input:focus, .field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .status { font-size: 0.85rem; margin-top: 0.75rem; color: var(--accent-hover); font-weight: 500; }
 
     /* Línea temporal */
     .timeline {
@@ -144,7 +204,8 @@
       background: var(--card);
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 18px rgba(139, 107, 183, 0.06);
     }
     .card img {
       width: 100%;
@@ -161,7 +222,7 @@
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.88);
+      background: rgba(24, 19, 31, 0.9);
       display: none;
       align-items: center;
       justify-content: center;
@@ -169,7 +230,7 @@
       z-index: 100;
     }
     .lightbox.active { display: flex; }
-    .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+    .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -177,6 +238,19 @@
   <header>
     <h1>Nuestra Historia</h1>
     <p id="header-desc">Álbum privado — Solo para nosotros dos.</p>
+
+    <!-- Contador en tiempo real -->
+    <div id="counter-box" class="counter-box">
+      <div class="counter-label">Juntos desde el 18 de julio de 2021</div>
+      <div class="counter-grid">
+        <div class="counter-unit"><strong id="cnt-years">0</strong><span>Años</span></div>
+        <div class="counter-unit"><strong id="cnt-months">0</strong><span>Meses</span></div>
+        <div class="counter-unit"><strong id="cnt-days">0</strong><span>Días</span></div>
+        <div class="counter-unit"><strong id="cnt-hours">0</strong><span>Horas</span></div>
+      </div>
+      <div id="counter-total" class="counter-total"></div>
+    </div>
+
     <div id="toolbar" class="toolbar">
       <button class="secondary" onclick="toggleOrder()">Cambiar orden cronológico</button>
       <button onclick="togglePanel('upload-panel')">+ Añadir recuerdo</button>
@@ -232,33 +306,69 @@
   </div>
 
   <script>
-    // ==========================================
-    // PEGA AQUÍ TUS DOS CLAVES DE SUPABASE
-    // ==========================================
-    const SUPABASE_URL = "https://uadckzaydrwvgvprjchs.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_2GAEhz9BKUta6BRhOpeVXg_pjGfLteJ";
+    const SUPABASE_URL = window.APP_CONFIG.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = window.APP_CONFIG.SUPABASE_ANON_KEY;
 
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentUser = null;
     let ascending = true;
+
+    // Cálculo en tiempo real desde el 18 de julio de 2021
+    const INICIO_RELACION = new Date(2021, 6, 18, 0, 0, 0); // Mes 6 = Julio
+
+    function actualizarContador() {
+      const ahora = new Date();
+      let years = ahora.getFullYear() - INICIO_RELACION.getFullYear();
+      let months = ahora.getMonth() - INICIO_RELACION.getMonth();
+      let days = ahora.getDate() - INICIO_RELACION.getDate();
+
+      if (days < 0) {
+        months -= 1;
+        const ultimoDiaMesAnterior = new Date(ahora.getFullYear(), ahora.getMonth(), 0).getDate();
+        days += ultimoDiaMesAnterior;
+      }
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      const diffMs = ahora - INICIO_RELACION;
+      const totalDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const horas = ahora.getHours();
+      const mins = String(ahora.getMinutes()).padStart(2, "0");
+      const segs = String(ahora.getSeconds()).padStart(2, "0");
+
+      document.getElementById("cnt-years").textContent = years;
+      document.getElementById("cnt-months").textContent = months;
+      document.getElementById("cnt-days").textContent = days;
+      document.getElementById("cnt-hours").textContent = horas;
+      document.getElementById("counter-total").textContent =
+        `${totalDias.toLocaleString("es-ES")} días, ${horas} h ${mins} min ${segs} s sumando recuerdos`;
+    }
+
+    actualizarContador();
+    setInterval(actualizarContador, 1000);
 
     db.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user || null;
       const loginPanel = document.getElementById("login-panel");
       const toolbar = document.getElementById("toolbar");
       const timeline = document.getElementById("timeline");
+      const counterBox = document.getElementById("counter-box");
       const headerDesc = document.getElementById("header-desc");
 
       if (currentUser) {
         loginPanel.classList.remove("active");
         toolbar.classList.add("active");
         timeline.classList.add("active");
-        headerDesc.textContent = "10 años conociéndonos, 6 años caminando juntos y todos los recuerdos que nos quedan por guardar.";
+        counterBox.classList.add("active");
+        headerDesc.textContent = "10 años conociéndonos y toda una vida por delante.";
         cargarRecuerdos();
       } else {
         loginPanel.classList.add("active");
         toolbar.classList.remove("active");
         timeline.classList.remove("active");
+        counterBox.classList.remove("active");
         timeline.innerHTML = "";
         headerDesc.textContent = "Álbum privado — Solo para nosotros dos.";
       }
@@ -324,7 +434,7 @@
       }
 
       btn.disabled = true;
-      status.textContent = "Cifrando y subiendo foto...";
+      status.textContent = "Optimizando y guardando foto...";
 
       try {
         const compressed = await compressImage(fileInput.files[0]);
@@ -335,7 +445,6 @@
           .upload(fileName, compressed, { contentType: "image/jpeg" });
         if (upErr) throw upErr;
 
-        // Guardamos el nombre privado del archivo en la base de datos
         const { error: insErr } = await db
           .from("recuerdos")
           .insert([{ fecha, titulo, descripcion, imagen_url: fileName }]);
@@ -380,7 +489,7 @@
         .order("fecha", { ascending });
 
       if (error) {
-        container.innerHTML = `<p style="text-align:center;color:#c86d51">Revisa tus claves de Supabase en el archivo index.html.</p>`;
+        container.innerHTML = `<p style="text-align:center;color:var(--accent)">Revisa tu clave de Supabase en el archivo config.js.</p>`;
         return;
       }
 
@@ -389,7 +498,6 @@
         return;
       }
 
-      // Generar enlaces temporales privados (válidos 1 hora) para cada foto
       const itemsConUrl = await Promise.all(data.map(async (item) => {
         const fileName = item.imagen_url.split("/").pop();
         const { data: signed } = await db.storage
